@@ -40,10 +40,9 @@ export default function ProvenanceGraph({ nodes, edges, rootID }: Props) {
     if (!containerRef.current) return;
 
     const cy = cytoscape({
-      container:  containerRef.current,
-      pixelRatio: "auto",               // fixes blurry canvas on HiDPI/Retina
-      minZoom:    0.2,
-      maxZoom:    4,
+      container: containerRef.current,
+      minZoom:   0.2,
+      maxZoom:   4,
       elements: [
         ...nodes.map((n) => ({
           data: {
@@ -58,7 +57,13 @@ export default function ProvenanceGraph({ nodes, edges, rootID }: Props) {
           data: { id: `${e.source}▶${e.target}`, source: e.source, target: e.target },
         })),
       ],
-      layout: { name: "preset" }, // positions set by dagre below
+      layout: {
+        name:    "dagre",
+        rankDir: "LR",
+        rankSep: 80,
+        nodeSep: 40,
+        padding: 48,
+      } as cytoscape.LayoutOptions,
       style: [
         // ── Nodes ──────────────────────────────────────────────────────────
         {
@@ -174,22 +179,16 @@ export default function ProvenanceGraph({ nodes, edges, rootID }: Props) {
 
     cyRef.current = cy;
 
-    // Run dagre layout, then fit once positions are finalised.
-    const layout = cy.layout({
-      name:    "dagre",
-      rankDir: "LR",
-      rankSep: 80,
-      nodeSep: 40,
-      padding: 48,
-    } as cytoscape.LayoutOptions);
-
-    layout.one("layoutstop", () => {
+    // Dagre runs synchronously in the constructor; delay fit by one frame
+    // so the browser has laid out the container before we calculate the viewport.
+    const raf = requestAnimationFrame(() => {
+      cy.resize();        // re-read container dimensions
       cy.fit(undefined, 48);
       setReady(true);
     });
-    layout.run();
 
     return () => {
+      cancelAnimationFrame(raf);
       cy.destroy();
       cyRef.current = null;
       setReady(false);
