@@ -203,9 +203,9 @@ export default function ProvenanceGraph({ nodes, edges, rootID }: Props) {
   return (
     <div className="flex flex-1 gap-3 min-h-0">
       {/* ── Canvas ──────────────────────────────────────────────────────────── */}
-      <div className="relative flex-1 rounded-xl border border-zinc-800 overflow-hidden bg-zinc-950 min-h-96">
-        {/* graph canvas */}
-        <div ref={containerRef} className="absolute inset-0" />
+      <div className="relative rounded-xl border border-zinc-800 overflow-hidden bg-zinc-950 w-full" style={{ height: "calc(100vh - 180px)", minHeight: "420px" }}>
+        {/* graph canvas — explicit height so Cytoscape can read clientHeight */}
+        <div ref={containerRef} className="w-full h-full" />
 
         {/* fade-in overlay while layout animates */}
         {!ready && (
