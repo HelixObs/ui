@@ -58,16 +58,7 @@ export default function ProvenanceGraph({ nodes, edges, rootID }: Props) {
           data: { id: `${e.source}▶${e.target}`, source: e.source, target: e.target },
         })),
       ],
-      layout: {
-        name:      "dagre",
-        rankDir:   "LR",          // left-to-right provenance chain
-        rankSep:   80,
-        nodeSep:   40,
-        edgeSep:   20,
-        padding:   48,
-        animate:   true,
-        animationDuration: 400,
-      } as cytoscape.LayoutOptions,
+      layout: { name: "preset" }, // positions set by dagre below
       style: [
         // ── Nodes ──────────────────────────────────────────────────────────
         {
@@ -183,11 +174,20 @@ export default function ProvenanceGraph({ nodes, edges, rootID }: Props) {
 
     cyRef.current = cy;
 
-    // Slight delay so the container has final dimensions before fit.
-    requestAnimationFrame(() => {
+    // Run dagre layout, then fit once positions are finalised.
+    const layout = cy.layout({
+      name:    "dagre",
+      rankDir: "LR",
+      rankSep: 80,
+      nodeSep: 40,
+      padding: 48,
+    } as cytoscape.LayoutOptions);
+
+    layout.one("layoutstop", () => {
       cy.fit(undefined, 48);
       setReady(true);
     });
+    layout.run();
 
     return () => {
       cy.destroy();
