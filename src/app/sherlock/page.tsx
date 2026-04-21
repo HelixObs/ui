@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import Link from "next/link";
+import SherlockLogo from "@/components/SherlockLogo";
 
 interface MemoryEntry {
   id: string;
@@ -54,7 +55,7 @@ export default function SherlockHomePage() {
       {/* Hero */}
       <div className="bg-gradient-to-br from-amber-900 via-amber-800 to-orange-700 px-8 py-16 flex flex-col items-center text-center gap-6">
         <div className="size-20 rounded-full bg-amber-600 flex items-center justify-center shadow-xl">
-          <span className="text-white text-3xl font-bold">S</span>
+          <SherlockLogo size={44} className="text-white" />
         </div>
         <div>
           <h1 className="text-4xl font-bold text-white mb-2">Sherlock</h1>
@@ -136,8 +137,8 @@ export default function SherlockHomePage() {
             {STEPS.map((s) => (
               <div key={s.level} className="rounded-2xl border border-amber-100 bg-amber-50 px-4 py-4 flex flex-col gap-2">
                 <div className="size-8 rounded-full bg-amber-800 flex items-center justify-center">
-                  <span className="text-amber-200 text-xs font-bold">{s.level}</span>
-                </div>
+                <span className="text-amber-200 text-xs font-bold">{s.level}</span>
+              </div>
                 <p className="text-sm font-semibold text-amber-900">{s.title}</p>
                 <p className="text-xs text-stone-500 leading-relaxed">{s.desc}</p>
               </div>
