@@ -19,6 +19,10 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Link href="/" className="text-sm font-semibold tracking-widest text-zinc-900 hover:text-black">
             HELIXOBS
           </Link>
+          <span className="text-zinc-200 text-xs">|</span>
+          <Link href="/sherlock" className="text-sm font-semibold text-amber-700 hover:text-amber-900 transition-colors">
+            Sherlock
+          </Link>
           <span className="text-zinc-400 text-xs">entity observability</span>
         </header>
         <main className="flex-1 flex flex-col">{children}</main>
