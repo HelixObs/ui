@@ -14,12 +14,12 @@ export const metadata: Metadata = {
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full`}>
-      <body className="min-h-full flex flex-col bg-zinc-950 text-zinc-100 antialiased">
-        <header className="border-b border-zinc-800 px-6 py-3 flex items-center gap-6 shrink-0">
-          <Link href="/" className="text-sm font-semibold tracking-widest text-zinc-100 hover:text-white">
+      <body className="min-h-full flex flex-col bg-white text-zinc-900 antialiased">
+        <header className="border-b border-zinc-200 px-6 py-3 flex items-center gap-6 shrink-0">
+          <Link href="/" className="text-sm font-semibold tracking-widest text-zinc-900 hover:text-black">
             HELIXOBS
           </Link>
-          <span className="text-zinc-600 text-xs">entity observability</span>
+          <span className="text-zinc-400 text-xs">entity observability</span>
         </header>
         <main className="flex-1 flex flex-col">{children}</main>
       </body>

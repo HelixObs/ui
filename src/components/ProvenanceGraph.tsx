@@ -15,18 +15,18 @@ interface Props {
 
 // ── Colours ────────────────────────────────────────────────────────────────────
 const C = {
-  nodeBg:         "#27272a", // zinc-800
-  nodeBorder:     "#52525b", // zinc-600
-  nodeErrorBg:    "#7f1d1d", // red-900
+  nodeBg:         "#f4f4f5", // zinc-100
+  nodeBorder:     "#a1a1aa", // zinc-400
+  nodeErrorBg:    "#fee2e2", // red-100
   nodeErrorBorder:"#ef4444", // red-500
-  nodeRootBorder: "#a1a1aa", // zinc-400
-  nodeSelected:   "#e4e4e7", // zinc-200
+  nodeRootBorder: "#52525b", // zinc-600
+  nodeSelected:   "#18181b", // zinc-900
   nodeHover:      "#71717a", // zinc-500
-  label:          "#d4d4d8", // zinc-300
-  labelSelected:  "#ffffff",
-  edge:           "#3f3f46", // zinc-700
-  edgeSelected:   "#71717a", // zinc-500
-  bg:             "#09090b", // zinc-950
+  label:          "#3f3f46", // zinc-700
+  labelSelected:  "#09090b", // zinc-950
+  edge:           "#d4d4d8", // zinc-300
+  edgeSelected:   "#a1a1aa", // zinc-400
+  bg:             "#ffffff", // white
 };
 
 export default function ProvenanceGraph({ nodes, edges, rootID }: Props) {
@@ -203,27 +203,27 @@ export default function ProvenanceGraph({ nodes, edges, rootID }: Props) {
   return (
     <div className="flex flex-1 gap-3 min-h-0">
       {/* ── Canvas ──────────────────────────────────────────────────────────── */}
-      <div className="relative rounded-xl border border-zinc-800 overflow-hidden bg-zinc-950 w-full" style={{ height: "calc(100vh - 180px)", minHeight: "420px" }}>
+      <div className="relative rounded-xl border border-zinc-200 overflow-hidden bg-white w-full" style={{ height: "calc(100vh - 180px)", minHeight: "420px" }}>
         {/* graph canvas — explicit height so Cytoscape can read clientHeight */}
         <div ref={containerRef} className="w-full h-full" />
 
         {/* fade-in overlay while layout animates */}
         {!ready && (
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="text-xs text-zinc-600 animate-pulse">Laying out graph…</span>
+            <span className="text-xs text-zinc-400 animate-pulse">Laying out graph…</span>
           </div>
         )}
 
         {/* Toolbar */}
-        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1 rounded-lg border border-zinc-800 bg-zinc-900/80 backdrop-blur px-2 py-1.5 shadow-xl">
+        <div className="absolute bottom-4 left-1/2 -translate-x-1/2 flex items-center gap-1 rounded-lg border border-zinc-200 bg-white/90 backdrop-blur px-2 py-1.5 shadow-md">
           <ToolbarButton onClick={zoomIn}  title="Zoom in">+</ToolbarButton>
           <ToolbarButton onClick={zoomOut} title="Zoom out">−</ToolbarButton>
-          <div className="w-px h-4 bg-zinc-700 mx-1" />
+          <div className="w-px h-4 bg-zinc-300 mx-1" />
           <ToolbarButton onClick={fit} title="Fit graph">⊡</ToolbarButton>
         </div>
 
         {/* Node count badge */}
-        <div className="absolute top-3 left-3 rounded-md bg-zinc-900/70 backdrop-blur border border-zinc-800 px-2.5 py-1 text-xs text-zinc-500 pointer-events-none">
+        <div className="absolute top-3 left-3 rounded-md bg-white/90 backdrop-blur border border-zinc-200 px-2.5 py-1 text-xs text-zinc-500 pointer-events-none">
           {nodes.length} node{nodes.length !== 1 ? "s" : ""} · {edges.length} edge{edges.length !== 1 ? "s" : ""}
         </div>
       </div>
@@ -246,7 +246,7 @@ function ToolbarButton({ onClick, title, children }: { onClick: () => void; titl
     <button
       onClick={onClick}
       title={title}
-      className="w-8 h-7 flex items-center justify-center rounded text-zinc-400 hover:text-zinc-100 hover:bg-zinc-700 text-base font-medium transition-colors"
+      className="w-8 h-7 flex items-center justify-center rounded text-zinc-500 hover:text-zinc-900 hover:bg-zinc-100 text-base font-medium transition-colors"
     >
       {children}
     </button>
@@ -255,27 +255,27 @@ function ToolbarButton({ onClick, title, children }: { onClick: () => void; titl
 
 function NodePanel({ node, onClose }: { node: GraphNode; onClose: () => void }) {
   return (
-    <aside className="w-72 shrink-0 rounded-xl border border-zinc-800 bg-zinc-950 flex flex-col overflow-hidden shadow-xl">
+    <aside className="w-72 shrink-0 rounded-xl border border-zinc-200 bg-white flex flex-col overflow-hidden shadow-lg">
       {/* Header */}
-      <div className={`px-4 py-3 border-b flex items-start justify-between gap-2 ${node.has_error ? "border-red-900 bg-red-950/40" : "border-zinc-800"}`}>
+      <div className={`px-4 py-3 border-b flex items-start justify-between gap-2 ${node.has_error ? "border-red-200 bg-red-50" : "border-zinc-200"}`}>
         <div className="min-w-0">
-          <p className="font-mono text-sm text-zinc-100 break-all leading-snug">{node.id}</p>
+          <p className="font-mono text-sm text-zinc-900 break-all leading-snug">{node.id}</p>
           <p className="text-xs text-zinc-500 mt-0.5">{node.instrument_id}</p>
         </div>
-        <button onClick={onClose} aria-label="Close" className="text-zinc-600 hover:text-zinc-300 text-xl leading-none shrink-0 mt-0.5 transition-colors">×</button>
+        <button onClick={onClose} aria-label="Close" className="text-zinc-400 hover:text-zinc-700 text-xl leading-none shrink-0 mt-0.5 transition-colors">×</button>
       </div>
 
       <div className="flex-1 overflow-y-auto px-4 py-3 flex flex-col gap-4">
         {/* Status */}
         <div className="flex items-center gap-2">
-          <span className={`size-2 rounded-full shrink-0 ${node.has_error ? "bg-red-500 shadow-[0_0_6px_theme(colors.red.500)]" : "bg-emerald-500 shadow-[0_0_6px_theme(colors.emerald.500)]"}`} />
-          <span className="text-xs text-zinc-400">{node.has_error ? "error detected" : "ok"}</span>
+          <span className={`size-2 rounded-full shrink-0 ${node.has_error ? "bg-red-500" : "bg-emerald-500"}`} />
+          <span className="text-xs text-zinc-500">{node.has_error ? "error detected" : "ok"}</span>
         </div>
 
         {/* Trace ID */}
         {node.trace_id && (
           <Field label="Trace ID">
-            <p className="font-mono text-xs text-zinc-400 break-all">{node.trace_id}</p>
+            <p className="font-mono text-xs text-zinc-500 break-all">{node.trace_id}</p>
           </Field>
         )}
 
@@ -286,7 +286,7 @@ function NodePanel({ node, onClose }: { node: GraphNode; onClose: () => void }) 
               {Object.entries(node.metadata).map(([k, v]) => (
                 <div key={k} className="grid grid-cols-2 gap-2 text-xs">
                   <dt className="text-zinc-500 truncate" title={k}>{k}</dt>
-                  <dd className="font-mono text-zinc-300 break-all">{v}</dd>
+                  <dd className="font-mono text-zinc-700 break-all">{v}</dd>
                 </div>
               ))}
             </dl>
@@ -298,7 +298,7 @@ function NodePanel({ node, onClose }: { node: GraphNode; onClose: () => void }) 
           <Field label="Parents">
             <ul className="flex flex-col gap-1">
               {node.parent_ids.map((pid) => (
-                <li key={pid} className="font-mono text-xs text-zinc-400 break-all">{pid}</li>
+                <li key={pid} className="font-mono text-xs text-zinc-500 break-all">{pid}</li>
               ))}
             </ul>
           </Field>
@@ -311,7 +311,7 @@ function NodePanel({ node, onClose }: { node: GraphNode; onClose: () => void }) 
 function Field({ label, children }: { label: string; children: React.ReactNode }) {
   return (
     <div>
-      <p className="text-xs font-semibold text-zinc-500 uppercase tracking-wider mb-2">{label}</p>
+      <p className="text-xs font-semibold text-zinc-400 uppercase tracking-wider mb-2">{label}</p>
       {children}
     </div>
   );
