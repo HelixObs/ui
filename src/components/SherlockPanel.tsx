@@ -40,12 +40,16 @@ const CLASS_LABEL: Record<string, string> = {
 const LS_KEY = "sherlock.github_token";
 
 export default function SherlockPanel({ entityID, instrumentID, onClose, fullPage = false }: Props) {
-  const [githubToken,      setGithubToken]      = useState(() => {
-    try { return localStorage.getItem(LS_KEY) ?? ""; } catch { return ""; }
-  });
-  const [tokenSaved,       setTokenSaved]       = useState(() => {
-    try { return !!localStorage.getItem(LS_KEY); } catch { return false; }
-  });
+  const [githubToken,      setGithubToken]      = useState("");
+  const [tokenSaved,       setTokenSaved]       = useState(false);
+
+  // Load saved token after mount (localStorage unavailable during SSR).
+  useEffect(() => {
+    try {
+      const saved = localStorage.getItem(LS_KEY);
+      if (saved) { setGithubToken(saved); setTokenSaved(true); }
+    } catch { /* storage unavailable */ }
+  }, []);
   const [sessionId,        setSessionId]        = useState<string | null>(null);
   const [messages,         setMessages]         = useState<Message[]>([]);
   const [streaming,        setStreaming]        = useState(false);
