@@ -43,11 +43,11 @@ export default function SherlockPanel({ entityID, instrumentID, onClose, fullPag
   const [githubToken,      setGithubToken]      = useState("");
   const [tokenSaved,       setTokenSaved]       = useState(false);
 
-  // Load saved token after mount (localStorage unavailable during SSR).
+  // Pre-fill token from localStorage after mount — gate still shows so user clicks Investigate.
   useEffect(() => {
     try {
       const saved = localStorage.getItem(LS_KEY);
-      if (saved) { setGithubToken(saved); setTokenSaved(true); }
+      if (saved) setGithubToken(saved);
     } catch { /* storage unavailable */ }
   }, []);
   const [sessionId,        setSessionId]        = useState<string | null>(null);
