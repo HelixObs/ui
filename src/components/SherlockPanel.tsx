@@ -37,9 +37,15 @@ const CLASS_LABEL: Record<string, string> = {
   unknown:        "Unknown",
 };
 
+const LS_KEY = "sherlock.github_token";
+
 export default function SherlockPanel({ entityID, instrumentID, onClose, fullPage = false }: Props) {
-  const [githubToken,      setGithubToken]      = useState("");
-  const [tokenSaved,       setTokenSaved]       = useState(false);
+  const [githubToken,      setGithubToken]      = useState(() => {
+    try { return localStorage.getItem(LS_KEY) ?? ""; } catch { return ""; }
+  });
+  const [tokenSaved,       setTokenSaved]       = useState(() => {
+    try { return !!localStorage.getItem(LS_KEY); } catch { return false; }
+  });
   const [sessionId,        setSessionId]        = useState<string | null>(null);
   const [messages,         setMessages]         = useState<Message[]>([]);
   const [streaming,        setStreaming]        = useState(false);
@@ -135,6 +141,10 @@ export default function SherlockPanel({ entityID, instrumentID, onClose, fullPag
   };
 
   const startInvestigation = useCallback(() => {
+    try {
+      if (githubToken) localStorage.setItem(LS_KEY, githubToken);
+      else localStorage.removeItem(LS_KEY);
+    } catch { /* storage unavailable */ }
     setTokenSaved(true);
     setMessages([]);
     setDone(null);
@@ -182,14 +192,30 @@ export default function SherlockPanel({ entityID, instrumentID, onClose, fullPag
               Paste a read-only PAT, or leave blank to skip.
             </p>
           </div>
-          <input
-            type="password"
-            placeholder="GitHub PAT — ghp_… (optional)"
-            value={githubToken}
-            onChange={(e) => setGithubToken(e.target.value)}
-            onKeyDown={(e) => e.key === "Enter" && startInvestigation()}
-            className="w-full rounded-xl bg-zinc-50 border border-zinc-200 px-4 py-2.5 text-sm font-mono text-zinc-800 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 focus:bg-white transition-colors"
-          />
+          <div className="w-full flex flex-col gap-1">
+            <input
+              type="password"
+              placeholder="GitHub PAT — ghp_… (optional)"
+              value={githubToken}
+              onChange={(e) => setGithubToken(e.target.value)}
+              onKeyDown={(e) => e.key === "Enter" && startInvestigation()}
+              className="w-full rounded-xl bg-zinc-50 border border-zinc-200 px-4 py-2.5 text-sm font-mono text-zinc-800 placeholder-zinc-400 focus:outline-none focus:border-zinc-400 focus:bg-white transition-colors"
+            />
+            {githubToken && (
+              <div className="flex items-center justify-between px-1">
+                <span className="text-xs text-zinc-400">Token saved in browser</span>
+                <button
+                  onClick={() => {
+                    try { localStorage.removeItem(LS_KEY); } catch { /* ignore */ }
+                    setGithubToken("");
+                  }}
+                  className="text-xs text-red-400 hover:text-red-600 transition-colors"
+                >
+                  Forget
+                </button>
+              </div>
+            )}
+          </div>
           <button
             onClick={startInvestigation}
             className="w-full rounded-xl bg-zinc-900 hover:bg-zinc-700 px-4 py-2.5 text-sm font-medium text-white transition-colors"
