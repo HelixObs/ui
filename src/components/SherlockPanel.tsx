@@ -375,38 +375,49 @@ function ErrorNote({ text }: { text: string }) {
 }
 
 function HypothesisCard({ data }: { data: HypothesisData }) {
+  const confColor = CONFIDENCE_COLOR[data.confidence] ?? "text-zinc-500 bg-zinc-50 border-zinc-200";
   return (
-    <div className="flex items-start gap-2.5">
-      <div className="size-7 rounded-full bg-zinc-900 flex items-center justify-center shrink-0 mt-0.5">
-        <span className="text-white text-[10px] font-bold">S</span>
-      </div>
-      <div className="flex-1 rounded-2xl rounded-tl-sm border border-zinc-200 bg-white shadow-sm px-4 py-4 flex flex-col gap-3">
-        <div className="flex items-center justify-between gap-3">
-          <span className="text-sm font-semibold text-zinc-900">
+    <div className="mt-2 rounded-2xl border-2 border-zinc-900 bg-white shadow-lg overflow-hidden">
+      {/* Verdict banner */}
+      <div className="bg-zinc-900 px-5 py-4 flex items-center justify-between gap-4">
+        <div>
+          <p className="text-[11px] font-semibold uppercase tracking-widest text-zinc-400 mb-1">Root cause</p>
+          <p className="text-xl font-bold text-white">
             {CLASS_LABEL[data.classification] ?? data.classification}
-          </span>
-          <span className={`text-xs font-medium px-2 py-0.5 rounded-full border ${CONFIDENCE_COLOR[data.confidence] ?? "text-zinc-500 bg-zinc-50 border-zinc-200"}`}>
-            {data.confidence} confidence
-          </span>
+          </p>
         </div>
-        <p className="text-sm text-zinc-700 leading-relaxed">{data.summary}</p>
+        <span className={`shrink-0 text-xs font-semibold px-3 py-1 rounded-full border ${confColor}`}>
+          {data.confidence} confidence
+        </span>
+      </div>
+
+      {/* Body */}
+      <div className="px-5 py-4 flex flex-col gap-4">
+        <p className="text-sm text-zinc-800 leading-relaxed">{data.summary}</p>
+
         {data.evidence.length > 0 && (
-          <ul className="flex flex-col gap-1.5 border-t border-zinc-100 pt-3">
-            {data.evidence.map((e, i) => (
-              <li key={i} className="flex items-start gap-2 text-xs text-zinc-500">
-                <span className="text-zinc-300 shrink-0 mt-0.5">→</span>
-                <span>{e}</span>
-              </li>
-            ))}
-          </ul>
-        )}
-        {data.recommendation && (
-          <div className="rounded-xl bg-zinc-50 border border-zinc-100 px-3 py-2.5 text-xs text-zinc-700">
-            <span className="font-semibold text-zinc-500 mr-1.5">Next step</span>{data.recommendation}
+          <div>
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-zinc-400 mb-2">Evidence</p>
+            <ul className="flex flex-col gap-2">
+              {data.evidence.map((e, i) => (
+                <li key={i} className="flex items-start gap-2.5 text-xs text-zinc-600">
+                  <span className="shrink-0 mt-0.5 size-4 rounded-full bg-zinc-100 flex items-center justify-center text-zinc-400 font-bold">{i + 1}</span>
+                  <span className="leading-relaxed">{e}</span>
+                </li>
+              ))}
+            </ul>
           </div>
         )}
+
+        {data.recommendation && (
+          <div className="rounded-xl bg-zinc-900 px-4 py-3">
+            <p className="text-[11px] font-semibold uppercase tracking-widest text-zinc-400 mb-1">Next step</p>
+            <p className="text-sm text-white leading-relaxed">{data.recommendation}</p>
+          </div>
+        )}
+
         {data.gaps && (
-          <p className="text-xs text-zinc-400 italic border-t border-zinc-100 pt-2">{data.gaps}</p>
+          <p className="text-xs text-zinc-400 italic border-t border-zinc-100 pt-3">{data.gaps}</p>
         )}
       </div>
     </div>
