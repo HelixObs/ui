@@ -240,7 +240,9 @@ export default function SherlockPanel({ entityID, instrumentID, onClose, fullPag
 
             {done && (
               <p className="text-[11px] text-stone-400 text-center mt-1">
-                {(done.input_tokens + done.output_tokens).toLocaleString()} tokens · ${done.cost_usd.toFixed(4)} · {done.model}
+                {done.model === "memory"
+                  ? "Loaded from memory · $0.00"
+                  : `${(done.input_tokens + done.output_tokens).toLocaleString()} tokens · $${done.cost_usd.toFixed(4)} · ${done.model}`}
               </p>
             )}
             <div ref={bottomRef} />
