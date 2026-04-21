@@ -12,6 +12,7 @@ interface Props {
   entityID: string;
   instrumentID?: string;
   onClose: () => void;
+  fullPage?: boolean;
 }
 
 type Message =
@@ -34,7 +35,7 @@ const CLASS_LABEL: Record<string, string> = {
   unknown:        "Unknown",
 };
 
-export default function SherlockPanel({ entityID, instrumentID, onClose }: Props) {
+export default function SherlockPanel({ entityID, instrumentID, onClose, fullPage = false }: Props) {
   const [githubToken, setGithubToken] = useState("");
   const [tokenSaved,  setTokenSaved]  = useState(false);
   const [sessionId,   setSessionId]   = useState<string | null>(null);
@@ -137,7 +138,7 @@ export default function SherlockPanel({ entityID, instrumentID, onClose }: Props
   }, [reply, runStream]);
 
   return (
-    <aside className="w-96 shrink-0 flex flex-col rounded-xl border border-zinc-200 bg-white shadow-2xl overflow-hidden">
+    <aside className={`${fullPage ? "w-full rounded-none border-0 shadow-none" : "w-96 shrink-0 rounded-xl border border-zinc-200 shadow-2xl"} flex flex-col bg-white overflow-hidden h-full`}>
       {/* Header */}
       <div className="flex items-center justify-between px-4 py-3 border-b border-zinc-200 shrink-0">
         <div>
