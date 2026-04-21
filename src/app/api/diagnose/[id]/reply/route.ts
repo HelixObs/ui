@@ -6,9 +6,9 @@ const SHERLOCK_URL = process.env.SHERLOCK_URL ?? "http://localhost:8082";
 
 export async function POST(
   req: Request,
-  props: { params: Promise<{ sessionId: string }> },
+  props: { params: Promise<{ id: string }> },
 ) {
-  const { sessionId } = await props.params;
+  const { id: sessionId } = await props.params;
   const body = await req.json();
 
   const upstream = await fetch(
