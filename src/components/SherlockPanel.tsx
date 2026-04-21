@@ -93,7 +93,7 @@ export default function SherlockPanel({ entityID, instrumentID, onClose, fullPag
       case "step":
         if (chunk.text) {
           // Tool call announcements (→ **name**(...)) become tool_call bubbles.
-          const toolMatch = chunk.text.match(/^[\n\r]*→ \*\*(.+?)\*\*\((.*)?\)\s*$/s);
+          const toolMatch = chunk.text.match(/^[\n\r]*→ \*\*(.+?)\*\*\(([\s\S]*)?\)\s*$/);
           if (toolMatch) {
             setMessages((p) => [...p, {
               role: "tool_call",
