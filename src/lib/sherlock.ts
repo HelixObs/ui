@@ -1,7 +1,7 @@
 // Types and streaming helper for the Sherlock AI agent.
 // Used only by Client Components and API routes — never imports server-only modules.
 
-export type ChunkType = "step" | "hypothesis" | "question" | "memory_prompt" | "error" | "done";
+export type ChunkType = "step" | "evidence" | "hypothesis" | "question" | "memory_prompt" | "error" | "done";
 
 export interface DiagnoseChunk {
   type: ChunkType;
