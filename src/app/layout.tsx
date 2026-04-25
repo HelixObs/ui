@@ -23,6 +23,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Link href="/sherlock" className="text-sm font-semibold text-amber-700 hover:text-amber-900 transition-colors">
             Sherlock
           </Link>
+          <Link href="/monitor" className="text-sm font-semibold text-zinc-700 hover:text-zinc-900 transition-colors">
+            Monitor
+          </Link>
           <span className="text-zinc-400 text-xs">entity observability</span>
         </header>
         <main className="flex-1 flex flex-col">{children}</main>

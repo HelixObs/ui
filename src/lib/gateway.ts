@@ -21,7 +21,22 @@ export interface EntityGraph {
   edges: GraphEdge[];
 }
 
+export interface PlotConfig {
+  name: string;
+  label: string;
+  y_min: number;
+  y_max: number;
+  y_unit: string;
+}
+
 const gatewayURL = process.env.GATEWAY_URL ?? "http://localhost:8080";
+
+export async function fetchMonitorPlots(): Promise<PlotConfig[]> {
+  const url = `${gatewayURL}/api/v1/monitor/plots`;
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) throw new Error(`gateway ${res.status}: ${url}`);
+  return res.json() as Promise<PlotConfig[]>;
+}
 
 export async function fetchEntityGraph(
   entityID: string,
