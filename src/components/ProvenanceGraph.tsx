@@ -11,6 +11,7 @@ interface Props {
   nodes: GraphNode[];
   edges: GraphEdge[];
   rootID: string;
+  height?: string;
 }
 
 // ── Colours ────────────────────────────────────────────────────────────────────
@@ -29,7 +30,7 @@ const C = {
   bg:             "#ffffff", // white
 };
 
-export default function ProvenanceGraph({ nodes, edges, rootID }: Props) {
+export default function ProvenanceGraph({ nodes, edges, rootID, height = "calc(100vh - 180px)" }: Props) {
   const containerRef = useRef<HTMLDivElement>(null);
   const cyRef        = useRef<Core | null>(null);
   const [selected, setSelected] = useState<GraphNode | null>(null);
@@ -203,7 +204,7 @@ export default function ProvenanceGraph({ nodes, edges, rootID }: Props) {
   return (
     <div className="flex flex-1 gap-3 min-h-0">
       {/* ── Canvas ──────────────────────────────────────────────────────────── */}
-      <div className="relative rounded-xl border border-zinc-200 overflow-hidden bg-white w-full" style={{ height: "calc(100vh - 180px)", minHeight: "420px" }}>
+      <div className="relative rounded-xl border border-zinc-200 overflow-hidden bg-white w-full" style={{ height, minHeight: "420px" }}>
         {/* graph canvas — explicit height so Cytoscape can read clientHeight */}
         <div ref={containerRef} className="w-full h-full" />
 

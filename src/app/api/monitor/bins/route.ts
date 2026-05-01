@@ -1,6 +1,5 @@
 import { NextRequest, NextResponse } from "next/server";
-
-const gatewayURL = process.env.GATEWAY_URL ?? "http://localhost:8080";
+import { GATEWAY_URL as gatewayURL } from "@/lib/config";
 
 export async function GET(req: NextRequest) {
   const params = req.nextUrl.searchParams.toString();

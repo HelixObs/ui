@@ -1,13 +1,18 @@
 import Link from "next/link";
-import { fetchEntityGraph } from "@/lib/gateway";
+import { fetchEntityGraph, fetchEntityOperations } from "@/lib/gateway";
+import { GRAFANA_URL } from "@/lib/config";
 import ProvenanceGraph from "@/components/ProvenanceGraph";
+import OperationTimeline from "@/components/OperationTimeline";
 import DiagnoseButton from "@/components/DiagnoseButton";
 
 export default async function EntityPage(props: PageProps<"/entity/[id]">) {
   const { id } = await props.params;
   const entityID = decodeURIComponent(id);
 
-  const graph = await fetchEntityGraph(entityID);
+  const [graph, operations] = await Promise.all([
+    fetchEntityGraph(entityID),
+    fetchEntityOperations(entityID),
+  ]);
 
   if (!graph) {
     return (
@@ -41,12 +46,16 @@ export default async function EntityPage(props: PageProps<"/entity/[id]">) {
         <DiagnoseButton entityID={entityID} instrumentID={instrumentID} />
       </div>
 
-      {/* DAG — click any node to open the detail panel */}
+      {/* DAG */}
       <ProvenanceGraph
         nodes={graph.nodes}
         edges={graph.edges}
         rootID={entityID}
+        height={operations.length > 0 ? "50vh" : "calc(100vh - 180px)"}
       />
+
+      {/* Operation timeline — only shown when operations exist */}
+      <OperationTimeline operations={operations} entityID={entityID} grafanaURL={GRAFANA_URL} />
     </div>
   );
 }

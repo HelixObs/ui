@@ -2,8 +2,7 @@
 // Keeps SHERLOCK_URL server-side; browser talks to one origin.
 
 import { NextResponse } from "next/server";
-
-const SHERLOCK_URL = process.env.SHERLOCK_URL ?? "http://localhost:8082";
+import { SHERLOCK_URL } from "@/lib/config";
 
 export async function POST(
   req: Request,

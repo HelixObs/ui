@@ -1,5 +1,6 @@
 // Server-side helper for fetching data from the gateway API.
 // Never imported by Client Components — gateway URL stays server-side only.
+import { GATEWAY_URL as gatewayURL } from "@/lib/config";
 
 export interface GraphNode {
   id: string;
@@ -29,13 +30,27 @@ export interface PlotConfig {
   y_unit: string;
 }
 
-const gatewayURL = process.env.GATEWAY_URL ?? "http://localhost:8080";
 
 export async function fetchMonitorPlots(): Promise<PlotConfig[]> {
   const url = `${gatewayURL}/api/v1/monitor/plots`;
   const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) throw new Error(`gateway ${res.status}: ${url}`);
   return res.json() as Promise<PlotConfig[]>;
+}
+
+export interface EntityOperation {
+  operation: string;
+  trace_id: string;
+  timestamp_ns: number;
+  duration_ns: number;
+  metadata: Record<string, string>;
+}
+
+export async function fetchEntityOperations(entityID: string): Promise<EntityOperation[]> {
+  const url = `${gatewayURL}/api/v1/entity/${encodeURIComponent(entityID)}/operations`;
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) return [];
+  return res.json() as Promise<EntityOperation[]>;
 }
 
 export async function fetchEntityGraph(
