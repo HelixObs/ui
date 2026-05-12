@@ -30,7 +30,7 @@ export default function MonitorClient({ plots }: Props) {
   const [fromMs, setFromMs] = useState(() => Date.now() - 2 * 60 * 60 * 1000);
   const [customFrom, setCustomFrom] = useState("");
   const [customTo, setCustomTo] = useState("");
-  const instrument = "CHIME"; // TODO: make selectable when multi-instrument
+  const instrument = "CHIMEFRB"; // TODO: make selectable when multi-instrument
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   // Advance window in live mode every 2s

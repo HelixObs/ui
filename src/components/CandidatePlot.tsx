@@ -161,14 +161,17 @@ export default function CandidatePlot({
     binLookupRef.current = lookup;
   }, []);
 
+  const MAX_WINDOW_MS = 24 * 60 * 60 * 1000;
+
   const fetchAndRender = useCallback(async (floor: number, ceil: number) => {
     if (!canvasRef.current) return;
     setLoading(true);
+    const clampedFromMs = Math.max(fromMs, toMs - MAX_WINDOW_MS);
     try {
       const params = new URLSearchParams({
         plot: plotName,
         instrument,
-        from_ms: String(fromMs),
+        from_ms: String(clampedFromMs),
         to_ms: String(toMs),
         t_bins: String(CANVAS_W),
         y_bins: String(CANVAS_H),
