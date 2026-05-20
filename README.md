@@ -1,3 +1,5 @@
+HelixObs UI — the Entity Inspector and operator console. See **[helixobs.github.io](https://helixobs.github.io)** for full documentation.
+
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 
 ## Getting Started
