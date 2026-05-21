@@ -51,6 +51,7 @@ export default function NotificationsPage() {
   const [loadError, setLoadError] = useState("");
   const [deleting, setDeleting] = useState<number | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
+  const [highlightFingerprint, setHighlightFingerprint] = useState("");
 
   const [form, setForm] = useState({
     instrument_id: "",
@@ -64,13 +65,22 @@ export default function NotificationsPage() {
   const [submitting, setSubmitting] = useState(false);
 
   useEffect(() => {
+    const params = new URLSearchParams(window.location.search);
+    const urlInstrument = params.get("instrument_id") ?? "";
+    const urlFingerprint = params.get("fingerprint") ?? "";
+
     fetch("/api/instruments")
       .then((r) => r.json())
       .then((data: string[]) => {
         setInstruments(data);
-        if (data.length === 1) setFilterInstrument(data[0]);
+        const id = urlInstrument || (data.length === 1 ? data[0] : "");
+        if (id) {
+          setFilterInstrument(id);
+          loadFor(id, urlFingerprint);
+        }
       })
       .catch(() => {});
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
   function field(key: keyof typeof form) {
@@ -78,8 +88,7 @@ export default function NotificationsPage() {
       setForm((prev) => ({ ...prev, [key]: e.target.value }));
   }
 
-  async function load() {
-    const id = filterInstrument.trim();
+  async function loadFor(id: string, presetFingerprint = "") {
     if (!id) return;
     setLoadError("");
     try {
@@ -97,12 +106,29 @@ export default function NotificationsPage() {
       setSilences(silenceData);
       setLoaded(true);
       setForm((prev) => ({ ...prev, instrument_id: id }));
+      if (presetFingerprint) {
+        setHighlightFingerprint(presetFingerprint);
+        setForm((prev) => ({
+          ...prev,
+          instrument_id: id,
+          event_type: "helix.error",
+          fingerprint: presetFingerprint,
+        }));
+        setTimeout(() => {
+          document.getElementById("silence-form")?.scrollIntoView({ behavior: "smooth" });
+        }, 100);
+      }
     } catch (err: unknown) {
       setLoadError(err instanceof Error ? err.message : "Failed to load.");
     }
   }
 
+  function load() {
+    return loadFor(filterInstrument.trim());
+  }
+
   function prefillSilence(a: Alert) {
+    setHighlightFingerprint(a.fingerprint);
     setForm((prev) => ({
       ...prev,
       instrument_id: filterInstrument.trim(),
@@ -238,7 +264,14 @@ export default function NotificationsPage() {
                   </thead>
                   <tbody>
                     {alerts.map((a) => (
-                      <tr key={a.group_key} className="border-t border-zinc-100 hover:bg-zinc-50">
+                      <tr
+                        key={a.group_key}
+                        className={`border-t border-zinc-100 transition-colors ${
+                          highlightFingerprint && a.fingerprint === highlightFingerprint
+                            ? "bg-amber-50 hover:bg-amber-100"
+                            : "hover:bg-zinc-50"
+                        }`}
+                      >
                         <td className="px-3 py-2 text-zinc-500 whitespace-nowrap" title={a.last_seen}>
                           {timeAgo(a.last_seen)}
                         </td>
