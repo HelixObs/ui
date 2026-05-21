@@ -42,6 +42,47 @@ function scopeLabel(s: Silence): string {
 const inputCls =
   "rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-400";
 
+function Pager({
+  page,
+  pageCount,
+  total,
+  pageSize,
+  onPrev,
+  onNext,
+}: {
+  page: number;
+  pageCount: number;
+  total: number;
+  pageSize: number;
+  onPrev: () => void;
+  onNext: () => void;
+}) {
+  if (pageCount <= 1) return null;
+  const start = page * pageSize + 1;
+  const end = Math.min((page + 1) * pageSize, total);
+  return (
+    <div className="flex items-center justify-between mt-2 text-xs text-zinc-500">
+      <span>{start}–{end} of {total}</span>
+      <div className="flex gap-1">
+        <button
+          onClick={onPrev}
+          disabled={page === 0}
+          className="px-2 py-0.5 rounded border border-zinc-300 hover:border-zinc-500 disabled:opacity-30 transition-colors"
+        >
+          ‹ Prev
+        </button>
+        <button
+          onClick={onNext}
+          disabled={page >= pageCount - 1}
+          className="px-2 py-0.5 rounded border border-zinc-300 hover:border-zinc-500 disabled:opacity-30 transition-colors"
+        >
+          Next ›
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function NotificationsPage() {
   const [instruments, setInstruments] = useState<string[]>([]);
   const [filterInstrument, setFilterInstrument] = useState("");
@@ -52,6 +93,9 @@ export default function NotificationsPage() {
   const [deleting, setDeleting] = useState<number | null>(null);
   const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
   const [highlightFingerprint, setHighlightFingerprint] = useState("");
+  const [alertPage, setAlertPage] = useState(0);
+  const [silencePage, setSilencePage] = useState(0);
+  const PAGE_SIZE = 25;
 
   const [form, setForm] = useState({
     instrument_id: "",
@@ -104,6 +148,8 @@ export default function NotificationsPage() {
       ]);
       setAlerts(alertData);
       setSilences(silenceData);
+      setAlertPage(0);
+      setSilencePage(0);
       setLoaded(true);
       setForm((prev) => ({ ...prev, instrument_id: id }));
       if (presetFingerprint) {
@@ -200,6 +246,11 @@ export default function NotificationsPage() {
     (s) => new Date(s.expires_at) > new Date()
   );
 
+  const alertPageCount = Math.ceil(alerts.length / PAGE_SIZE);
+  const silencePageCount = Math.ceil(activeSilences.length / PAGE_SIZE);
+  const pagedAlerts = alerts.slice(alertPage * PAGE_SIZE, (alertPage + 1) * PAGE_SIZE);
+  const pagedSilences = activeSilences.slice(silencePage * PAGE_SIZE, (silencePage + 1) * PAGE_SIZE);
+
   return (
     <div className="p-6 max-w-4xl mx-auto w-full">
       <h1 className="text-lg font-semibold text-zinc-900 mb-1">Notifications</h1>
@@ -263,7 +314,7 @@ export default function NotificationsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {alerts.map((a) => (
+                    {pagedAlerts.map((a) => (
                       <tr
                         key={a.group_key}
                         className={`border-t border-zinc-100 transition-colors ${
@@ -313,6 +364,14 @@ export default function NotificationsPage() {
                     ))}
                   </tbody>
                 </table>
+                <Pager
+                  page={alertPage}
+                  pageCount={alertPageCount}
+                  total={alerts.length}
+                  pageSize={PAGE_SIZE}
+                  onPrev={() => setAlertPage((p) => p - 1)}
+                  onNext={() => setAlertPage((p) => p + 1)}
+                />
               </div>
             )}
           </section>
@@ -338,7 +397,7 @@ export default function NotificationsPage() {
                     </tr>
                   </thead>
                   <tbody>
-                    {activeSilences.map((s) => (
+                    {pagedSilences.map((s) => (
                       <tr key={s.id} className="border-t border-zinc-100 hover:bg-zinc-50">
                         <td className="px-3 py-2 text-zinc-600">{scopeLabel(s)}</td>
                         <td className="px-3 py-2 text-zinc-500" title={s.expires_at}>
@@ -393,6 +452,14 @@ export default function NotificationsPage() {
                     ))}
                   </tbody>
                 </table>
+                <Pager
+                  page={silencePage}
+                  pageCount={silencePageCount}
+                  total={activeSilences.length}
+                  pageSize={PAGE_SIZE}
+                  onPrev={() => setSilencePage((p) => p - 1)}
+                  onNext={() => setSilencePage((p) => p + 1)}
+                />
               </div>
             )}
           </section>
