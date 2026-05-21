@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import type { EntityOperation } from "@/lib/gateway";
+import type { EntityOperation } from "@/lib/herald";
 
 // ── Layout ───────────────────────────────────────────────────────
 const LABEL_W  = 200;

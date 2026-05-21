@@ -3,7 +3,7 @@
 import cytoscape, { type Core, type NodeSingular } from "cytoscape";
 import dagre from "cytoscape-dagre";
 import { useCallback, useEffect, useRef, useState } from "react";
-import type { GraphNode, GraphEdge } from "@/lib/gateway";
+import type { GraphNode, GraphEdge } from "@/lib/herald";
 
 cytoscape.use(dagre);
 

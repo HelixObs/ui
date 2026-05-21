@@ -1,5 +1,5 @@
 import Link from "next/link";
-import { fetchEntityGraph, fetchEntityOperations } from "@/lib/gateway";
+import { fetchEntityGraph, fetchEntityOperations } from "@/lib/herald";
 import { GRAFANA_URL } from "@/lib/config";
 import ProvenanceGraph from "@/components/ProvenanceGraph";
 import OperationTimeline from "@/components/OperationTimeline";

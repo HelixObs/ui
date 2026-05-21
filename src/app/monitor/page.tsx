@@ -1,4 +1,4 @@
-import { fetchMonitorPlots, type PlotConfig } from "@/lib/gateway";
+import { fetchMonitorPlots, type PlotConfig } from "@/lib/herald";
 import MonitorClient from "@/components/MonitorClient";
 
 export const dynamic = "force-dynamic";
@@ -8,7 +8,7 @@ export default async function MonitorPage() {
   try {
     plots = await fetchMonitorPlots();
   } catch {
-    // Gateway may not be running in dev — render empty state
+    // Herald may not be running in dev — render empty state
   }
   return (
     <div className="flex flex-col h-full">

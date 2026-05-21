@@ -1,6 +1,6 @@
-// Server-side helper for fetching data from the gateway API.
-// Never imported by Client Components — gateway URL stays server-side only.
-import { GATEWAY_URL as gatewayURL } from "@/lib/config";
+// Server-side helper for fetching data from the herald API.
+// Never imported by Client Components — herald URL stays server-side only.
+import { HERALD_URL } from "@/lib/config";
 
 export interface GraphNode {
   id: string;
@@ -32,9 +32,9 @@ export interface PlotConfig {
 
 
 export async function fetchMonitorPlots(): Promise<PlotConfig[]> {
-  const url = `${gatewayURL}/api/v1/monitor/plots`;
+  const url = `${HERALD_URL}/api/v1/monitor/plots`;
   const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) throw new Error(`gateway ${res.status}: ${url}`);
+  if (!res.ok) throw new Error(`herald ${res.status}: ${url}`);
   return res.json() as Promise<PlotConfig[]>;
 }
 
@@ -47,7 +47,7 @@ export interface EntityOperation {
 }
 
 export async function fetchEntityOperations(entityID: string): Promise<EntityOperation[]> {
-  const url = `${gatewayURL}/api/v1/entity/${encodeURIComponent(entityID)}/operations`;
+  const url = `${HERALD_URL}/api/v1/entity/${encodeURIComponent(entityID)}/operations`;
   const res = await fetch(url, { cache: "no-store" });
   if (!res.ok) return [];
   return res.json() as Promise<EntityOperation[]>;
@@ -56,9 +56,9 @@ export async function fetchEntityOperations(entityID: string): Promise<EntityOpe
 export async function fetchEntityGraph(
   entityID: string,
 ): Promise<EntityGraph | null> {
-  const url = `${gatewayURL}/api/v1/entity/${encodeURIComponent(entityID)}/graph`;
+  const url = `${HERALD_URL}/api/v1/entity/${encodeURIComponent(entityID)}/graph`;
   const res = await fetch(url, { cache: "no-store" });
   if (res.status === 404) return null;
-  if (!res.ok) throw new Error(`gateway ${res.status}: ${url}`);
+  if (!res.ok) throw new Error(`herald ${res.status}: ${url}`);
   return res.json() as Promise<EntityGraph>;
 }

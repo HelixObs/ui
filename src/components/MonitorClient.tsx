@@ -2,7 +2,7 @@
 
 import { useState, useEffect, useRef } from "react";
 import CandidatePlot from "./CandidatePlot";
-import type { PlotConfig } from "@/lib/gateway";
+import type { PlotConfig } from "@/lib/herald";
 
 interface Props {
   plots: PlotConfig[];
