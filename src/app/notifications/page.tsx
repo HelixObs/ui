@@ -287,6 +287,7 @@ export default function NotificationsPage() {
                       <th className="px-3 py-2">Expires</th>
                       <th className="px-3 py-2">Silenced by</th>
                       <th className="px-3 py-2">Reason</th>
+                      <th className="px-3 py-2">Issue</th>
                       <th className="px-3 py-2 w-8" />
                     </tr>
                   </thead>
@@ -300,6 +301,18 @@ export default function NotificationsPage() {
                         <td className="px-3 py-2 text-zinc-600">{s.silenced_by}</td>
                         <td className="px-3 py-2 text-zinc-500 max-w-xs truncate">
                           {s.reason ?? "—"}
+                        </td>
+                        <td className="px-3 py-2">
+                          {s.github_issue_url ? (
+                            <a
+                              href={s.github_issue_url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-xs text-amber-700 hover:text-amber-900 transition-colors"
+                            >
+                              #{s.github_issue_url.split("/").pop()}
+                            </a>
+                          ) : "—"}
                         </td>
                         <td className="px-3 py-2 text-right whitespace-nowrap">
                           {confirmDelete === s.id ? (

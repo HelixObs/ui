@@ -79,6 +79,7 @@ export interface Silence {
   silenced_at: string;
   expires_at: string;
   reason?: string;
+  github_issue_url?: string;
 }
 
 export async function fetchSilences(instrumentID: string): Promise<Silence[]> {
