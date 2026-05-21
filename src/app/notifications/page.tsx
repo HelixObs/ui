@@ -50,6 +50,7 @@ export default function NotificationsPage() {
   const [loaded, setLoaded] = useState(false);
   const [loadError, setLoadError] = useState("");
   const [deleting, setDeleting] = useState<number | null>(null);
+  const [confirmDelete, setConfirmDelete] = useState<number | null>(null);
 
   const [form, setForm] = useState({
     instrument_id: "",
@@ -113,6 +114,7 @@ export default function NotificationsPage() {
   }
 
   async function deleteSilence(id: number) {
+    setConfirmDelete(null);
     setDeleting(id);
     try {
       await fetch(`/api/silences/${id}`, { method: "DELETE" });
@@ -299,15 +301,34 @@ export default function NotificationsPage() {
                         <td className="px-3 py-2 text-zinc-500 max-w-xs truncate">
                           {s.reason ?? "—"}
                         </td>
-                        <td className="px-3 py-2 text-right">
-                          <button
-                            onClick={() => deleteSilence(s.id)}
-                            disabled={deleting === s.id}
-                            title="Unsilence"
-                            className="text-zinc-400 hover:text-red-600 disabled:opacity-40 transition-colors text-xs"
-                          >
-                            {deleting === s.id ? "…" : "✕"}
-                          </button>
+                        <td className="px-3 py-2 text-right whitespace-nowrap">
+                          {confirmDelete === s.id ? (
+                            <span className="inline-flex items-center gap-1">
+                              <span className="text-xs text-zinc-500">Remove?</span>
+                              <button
+                                onClick={() => deleteSilence(s.id)}
+                                className="text-xs text-red-600 hover:text-red-800 font-medium transition-colors"
+                              >
+                                Yes
+                              </button>
+                              <span className="text-zinc-300">/</span>
+                              <button
+                                onClick={() => setConfirmDelete(null)}
+                                className="text-xs text-zinc-400 hover:text-zinc-700 transition-colors"
+                              >
+                                No
+                              </button>
+                            </span>
+                          ) : (
+                            <button
+                              onClick={() => setConfirmDelete(s.id)}
+                              disabled={deleting === s.id}
+                              title="Unsilence"
+                              className="text-zinc-400 hover:text-red-600 disabled:opacity-40 transition-colors text-xs"
+                            >
+                              {deleting === s.id ? "…" : "✕"}
+                            </button>
+                          )}
                         </td>
                       </tr>
                     ))}
