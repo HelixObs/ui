@@ -53,6 +53,22 @@ export async function fetchEntityOperations(entityID: string): Promise<EntityOpe
   return res.json() as Promise<EntityOperation[]>;
 }
 
+export interface Alert {
+  group_key: string;
+  metadata: Record<string, string>;
+  occurrence_count: number;
+  first_seen: string;
+  last_seen: string;
+  entity_ids: string[];
+}
+
+export async function fetchAlerts(instrumentID: string): Promise<Alert[]> {
+  const url = `${HERALD_URL}/api/v1/notifications/alerts?instrument_id=${encodeURIComponent(instrumentID)}`;
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) return [];
+  return res.json() as Promise<Alert[]>;
+}
+
 export interface Silence {
   id: number;
   instrument_id: string;
