@@ -56,6 +56,7 @@ export async function fetchEntityOperations(entityID: string): Promise<EntityOpe
 export interface Alert {
   group_key: string;
   fingerprint: string;
+  github_issue_url?: string;
   metadata: Record<string, string>;
   occurrence_count: number;
   first_seen: string;

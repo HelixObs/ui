@@ -232,6 +232,7 @@ export default function NotificationsPage() {
                       <th className="px-3 py-2">Count</th>
                       <th className="px-3 py-2">Details</th>
                       <th className="px-3 py-2">Example entity</th>
+                      <th className="px-3 py-2">Issue</th>
                       <th className="px-3 py-2 w-16" />
                     </tr>
                   </thead>
@@ -253,6 +254,18 @@ export default function NotificationsPage() {
                             >
                               {a.entity_ids[0].slice(0, 16)}…
                             </Link>
+                          ) : "—"}
+                        </td>
+                        <td className="px-3 py-2">
+                          {a.github_issue_url ? (
+                            <a
+                              href={a.github_issue_url}
+                              target="_blank"
+                              rel="noreferrer"
+                              className="text-xs text-amber-700 hover:text-amber-900 transition-colors"
+                            >
+                              #{a.github_issue_url.split("/").pop()}
+                            </a>
                           ) : "—"}
                         </td>
                         <td className="px-3 py-2 text-right">
