@@ -53,6 +53,24 @@ export async function fetchEntityOperations(entityID: string): Promise<EntityOpe
   return res.json() as Promise<EntityOperation[]>;
 }
 
+export interface Silence {
+  id: number;
+  instrument_id: string;
+  event_type?: string;
+  fingerprint?: string;
+  silenced_by: string;
+  silenced_at: string;
+  expires_at: string;
+  reason?: string;
+}
+
+export async function fetchSilences(instrumentID: string): Promise<Silence[]> {
+  const url = `${HERALD_URL}/api/v1/notifications/silences?instrument_id=${encodeURIComponent(instrumentID)}`;
+  const res = await fetch(url, { cache: "no-store" });
+  if (!res.ok) return [];
+  return res.json() as Promise<Silence[]>;
+}
+
 export async function fetchEntityGraph(
   entityID: string,
 ): Promise<EntityGraph | null> {

@@ -26,6 +26,9 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <Link href="/monitor" className="text-sm font-semibold text-zinc-700 hover:text-zinc-900 transition-colors">
             Monitor
           </Link>
+          <Link href="/notifications" className="text-sm font-semibold text-zinc-700 hover:text-zinc-900 transition-colors">
+            Notifications
+          </Link>
           <span className="text-zinc-400 text-xs">entity observability</span>
         </header>
         <main className="flex-1 flex flex-col">{children}</main>
