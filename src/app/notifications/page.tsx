@@ -47,15 +47,22 @@ export default function SilencesPage() {
 
   async function loadSilences() {
     const id = filterInstrument.trim();
+    console.log("[notifications] loadSilences called, id=", id);
     if (!id) return;
     setLoadError("");
     try {
-      const res = await fetch(`/api/silences?instrument_id=${encodeURIComponent(id)}`);
+      const url = `/api/silences?instrument_id=${encodeURIComponent(id)}`;
+      console.log("[notifications] fetching", url);
+      const res = await fetch(url);
+      console.log("[notifications] response status=", res.status, "ok=", res.ok);
       if (!res.ok) throw new Error(`${res.status}`);
-      setSilences(await res.json());
+      const data = await res.json();
+      console.log("[notifications] data=", data);
+      setSilences(data);
       setLoaded(true);
       setForm((prev) => ({ ...prev, instrument_id: id }));
-    } catch {
+    } catch (err) {
+      console.error("[notifications] fetch error:", err);
       setLoadError("Failed to load silences.");
     }
   }
