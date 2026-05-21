@@ -34,7 +34,7 @@ function metaSummary(meta: Record<string, string>): string {
 }
 
 function scopeLabel(s: Silence): string {
-  if (s.fingerprint) return "fingerprint";
+  if (s.fingerprint) return `${s.event_type || "helix.error"} · ${s.fingerprint}`;
   if (s.event_type) return s.event_type;
   return "instrument-wide";
 }
@@ -106,7 +106,7 @@ export default function NotificationsPage() {
       ...prev,
       instrument_id: filterInstrument.trim(),
       event_type: "helix.error",
-      fingerprint: "",
+      fingerprint: a.fingerprint,
       reason: "",
     }));
     document.getElementById("silence-form")?.scrollIntoView({ behavior: "smooth" });
@@ -354,14 +354,14 @@ export default function NotificationsPage() {
             <label className="flex flex-col gap-1">
               <span className="text-xs text-zinc-500">
                 Fingerprint{" "}
-                <span className="text-zinc-400">(optional — omit to silence by event type)</span>
+                <span className="text-zinc-400">(auto-filled from alert — omit to silence all errors)</span>
               </span>
               <input
                 type="text"
                 value={form.fingerprint}
-                onChange={field("fingerprint")}
-                placeholder="sha256:…"
-                className={`font-mono ${inputCls}`}
+                readOnly
+                placeholder="click Silence on an alert above to target a specific error"
+                className={`font-mono bg-zinc-50 text-zinc-500 ${inputCls}`}
               />
             </label>
 
