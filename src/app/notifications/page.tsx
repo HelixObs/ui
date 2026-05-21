@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import Link from "next/link";
 import type { Alert, Silence } from "@/lib/herald";
 
@@ -43,6 +43,7 @@ const inputCls =
   "rounded-md border border-zinc-300 px-3 py-1.5 text-sm text-zinc-900 placeholder-zinc-400 focus:outline-none focus:ring-1 focus:ring-zinc-400";
 
 export default function NotificationsPage() {
+  const [instruments, setInstruments] = useState<string[]>([]);
   const [filterInstrument, setFilterInstrument] = useState("");
   const [alerts, setAlerts] = useState<Alert[]>([]);
   const [silences, setSilences] = useState<Silence[]>([]);
@@ -60,6 +61,16 @@ export default function NotificationsPage() {
   });
   const [formError, setFormError] = useState("");
   const [submitting, setSubmitting] = useState(false);
+
+  useEffect(() => {
+    fetch("/api/instruments")
+      .then((r) => r.json())
+      .then((data: string[]) => {
+        setInstruments(data);
+        if (data.length === 1) setFilterInstrument(data[0]);
+      })
+      .catch(() => {});
+  }, []);
 
   function field(key: keyof typeof form) {
     return (e: React.ChangeEvent<HTMLInputElement>) =>
@@ -170,14 +181,27 @@ export default function NotificationsPage() {
 
       {/* Instrument filter */}
       <div className="flex gap-3 items-center mb-6">
-        <input
-          type="text"
-          value={filterInstrument}
-          onChange={(e) => setFilterInstrument(e.target.value)}
-          onKeyDown={(e) => e.key === "Enter" && load()}
-          placeholder="Instrument ID (e.g. CHIMEFRB)"
-          className={`w-64 ${inputCls}`}
-        />
+        {instruments.length > 0 ? (
+          <select
+            value={filterInstrument}
+            onChange={(e) => setFilterInstrument(e.target.value)}
+            className={`w-64 ${inputCls}`}
+          >
+            <option value="">Select instrument…</option>
+            {instruments.map((id) => (
+              <option key={id} value={id}>{id}</option>
+            ))}
+          </select>
+        ) : (
+          <input
+            type="text"
+            value={filterInstrument}
+            onChange={(e) => setFilterInstrument(e.target.value)}
+            onKeyDown={(e) => e.key === "Enter" && load()}
+            placeholder="Instrument ID (e.g. CHIMEFRB)"
+            className={`w-64 ${inputCls}`}
+          />
+        )}
         <button
           onClick={load}
           className="rounded-md bg-zinc-800 hover:bg-zinc-700 px-4 py-1.5 text-sm font-medium text-white transition-colors"
