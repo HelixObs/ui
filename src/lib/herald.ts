@@ -22,22 +22,6 @@ export interface EntityGraph {
   edges: GraphEdge[];
 }
 
-export interface PlotConfig {
-  name: string;
-  label: string;
-  y_min: number;
-  y_max: number;
-  y_unit: string;
-}
-
-
-export async function fetchMonitorPlots(): Promise<PlotConfig[]> {
-  const url = `${HERALD_URL}/api/v1/monitor/plots`;
-  const res = await fetch(url, { cache: "no-store" });
-  if (!res.ok) throw new Error(`herald ${res.status}: ${url}`);
-  return res.json() as Promise<PlotConfig[]>;
-}
-
 export interface EntityOperation {
   operation: string;
   trace_id: string;

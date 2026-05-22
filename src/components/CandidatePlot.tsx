@@ -6,7 +6,7 @@ import { useRouter } from "next/navigation";
 interface BinResult {
   t: number;
   y: number;
-  snr: number;
+  weight: number;
   id: string;
   ts: number;
   yv: number;
@@ -21,11 +21,12 @@ interface BinsResponse {
   to_ns: number;
   y_min: number;
   y_max: number;
-  snr_max: number;
+  weight_max: number;
 }
 
 interface Props {
-  plotName: string;
+  yField: string;
+  weightField: string;
   plotLabel: string;
   yUnit: string;
   yMin: number;
@@ -44,7 +45,7 @@ const Y_AXIS_W = 60;
 const INFERNO: [number, number, number][] = [
   [  0,   0,   4],
   [ 40,  11,  84],
-  [ 101,  21, 110],
+  [101,  21, 110],
   [159,  42,  99],
   [212,  72,  66],
   [245, 125,  21],
@@ -52,7 +53,7 @@ const INFERNO: [number, number, number][] = [
   [252, 255, 164],
 ];
 
-function snrToRGB(t: number): [number, number, number] {
+function weightToRGB(t: number): [number, number, number] {
   if (t <= 0) return INFERNO[0];
   if (t >= 1) return INFERNO[INFERNO.length - 1];
   const scaled = t * (INFERNO.length - 1);
@@ -111,7 +112,8 @@ function computeXTicks(fromMs: number, toMs: number): { frac: number; label: str
 }
 
 export default function CandidatePlot({
-  plotName,
+  yField,
+  weightField,
   plotLabel,
   yUnit,
   yMin,
@@ -126,16 +128,16 @@ export default function CandidatePlot({
   const [yMinInput, setYMinInput] = useState(String(yMin));
   const [yMax, setYMax] = useState(yMaxDefault);
   const [yMaxInput, setYMaxInput] = useState(String(yMaxDefault));
-  const [snrDataMax, setSnrDataMax] = useState(0);
-  const [snrFloor, setSnrFloor] = useState(8.5);
-  const [snrCeil, setSnrCeil] = useState(25.0);
+  const [weightDataMax, setWeightDataMax] = useState(0);
+  const [weightFloor, setWeightFloor] = useState(0);
+  const [weightCeil, setWeightCeil] = useState(25.0);
   const [hoveredBin, setHoveredBin] = useState<BinResult | null>(null);
   const [loading, setLoading] = useState(false);
   const binsRef = useRef<BinsResponse | null>(null);
   // Flat lookup array indexed by t * CANVAS_H + y → O(1) hover
   const binLookupRef = useRef<(BinResult | null)[]>([]);
 
-  const SNR_SLIDER_MAX = 100;
+  const WEIGHT_SLIDER_MAX = 100;
 
   const renderCanvas = useCallback((data: BinsResponse, floor: number, ceil: number) => {
     const canvas = canvasRef.current;
@@ -148,8 +150,8 @@ export default function CandidatePlot({
     // Build O(1) hover lookup at the same time as rendering
     const lookup = new Array<BinResult | null>(CANVAS_W * CANVAS_H).fill(null);
     for (const bin of data.bins) {
-      const t = range > 0 ? Math.max(0, Math.min(1, (bin.snr - floor) / range)) : 0;
-      const [r, g, b] = snrToRGB(t);
+      const t = range > 0 ? Math.max(0, Math.min(1, (bin.weight - floor) / range)) : 0;
+      const [r, g, b] = weightToRGB(t);
       const idx = ((CANVAS_H - 1 - bin.y) * CANVAS_W + bin.t) * 4;
       imageData.data[idx] = r;
       imageData.data[idx + 1] = g;
@@ -169,7 +171,7 @@ export default function CandidatePlot({
     const clampedFromMs = Math.max(fromMs, toMs - MAX_WINDOW_MS);
     try {
       const params = new URLSearchParams({
-        plot: plotName,
+        y_field: yField,
         instrument,
         from_ms: String(clampedFromMs),
         to_ms: String(toMs),
@@ -177,25 +179,28 @@ export default function CandidatePlot({
         y_bins: String(CANVAS_H),
         y_min: String(yMinFilter),
         y_max: String(yMax),
+        y_min_default: String(yMin),
+        y_max_default: String(yMaxDefault),
       });
+      if (weightField) params.set("weight_field", weightField);
       const res = await fetch(`/api/monitor/bins?${params}`);
       if (!res.ok) return;
       const data: BinsResponse = await res.json();
       binsRef.current = data;
-      setSnrDataMax(data.snr_max);
+      setWeightDataMax(data.weight_max);
       renderCanvas(data, floor, ceil);
     } finally {
       setLoading(false);
     }
-  }, [plotName, instrument, fromMs, toMs, yMinFilter, yMax, renderCanvas]);
+  }, [yField, weightField, instrument, fromMs, toMs, yMinFilter, yMax, yMin, yMaxDefault, renderCanvas]);
 
   // Re-fetch when data params change
-  useEffect(() => { fetchAndRender(snrFloor, snrCeil); }, [fetchAndRender]); // eslint-disable-line react-hooks/exhaustive-deps
+  useEffect(() => { fetchAndRender(weightFloor, weightCeil); }, [fetchAndRender]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  // Re-paint instantly when SNR range changes — no refetch
+  // Re-paint instantly when weight range changes — no refetch
   useEffect(() => {
-    if (binsRef.current) renderCanvas(binsRef.current, snrFloor, snrCeil);
-  }, [snrFloor, snrCeil, renderCanvas]);
+    if (binsRef.current) renderCanvas(binsRef.current, weightFloor, weightCeil);
+  }, [weightFloor, weightCeil, renderCanvas]);
 
   const handleMouseMove = useCallback((e: React.MouseEvent<HTMLCanvasElement>) => {
     const canvas = canvasRef.current;
@@ -250,35 +255,37 @@ export default function CandidatePlot({
           <span>{yUnit}</span>
         </label>
 
-        {/* SNR range sliders */}
-        <div className="flex items-center gap-2">
-          <span className="text-zinc-400">SNR</span>
-          <span className="w-8 text-right tabular-nums">{snrFloor.toFixed(0)}</span>
-          <input
-            type="range"
-            min={0} max={SNR_SLIDER_MAX} step={0.5}
-            value={snrFloor}
-            onChange={(e) => {
-              const v = parseFloat(e.target.value);
-              setSnrFloor(Math.min(v, snrCeil - 1));
-            }}
-            className="w-24 accent-zinc-600"
-          />
-          <span>–</span>
-          <input
-            type="range"
-            min={0} max={SNR_SLIDER_MAX} step={0.5}
-            value={snrCeil}
-            onChange={(e) => {
-              const v = parseFloat(e.target.value);
-              setSnrCeil(Math.max(v, snrFloor + 1));
-            }}
-            className="w-24 accent-zinc-600"
-          />
-          <span className="w-8 tabular-nums">{snrCeil.toFixed(0)}</span>
-        </div>
+        {/* Weight range sliders (only shown when a weight field is configured) */}
+        {weightField && (
+          <div className="flex items-center gap-2">
+            <span className="text-zinc-400">Weight</span>
+            <span className="w-8 text-right tabular-nums">{weightFloor.toFixed(0)}</span>
+            <input
+              type="range"
+              min={0} max={WEIGHT_SLIDER_MAX} step={0.5}
+              value={weightFloor}
+              onChange={(e) => {
+                const v = parseFloat(e.target.value);
+                setWeightFloor(Math.min(v, weightCeil - 1));
+              }}
+              className="w-24 accent-zinc-600"
+            />
+            <span>–</span>
+            <input
+              type="range"
+              min={0} max={WEIGHT_SLIDER_MAX} step={0.5}
+              value={weightCeil}
+              onChange={(e) => {
+                const v = parseFloat(e.target.value);
+                setWeightCeil(Math.max(v, weightFloor + 1));
+              }}
+              className="w-24 accent-zinc-600"
+            />
+            <span className="w-8 tabular-nums">{weightCeil.toFixed(0)}</span>
+          </div>
+        )}
 
-        {snrDataMax > 0 && <span className="text-zinc-400">data max: {snrDataMax.toFixed(1)}</span>}
+        {weightDataMax > 0 && <span className="text-zinc-400">max: {weightDataMax.toFixed(2)}</span>}
         {loading && <span className="text-zinc-400">loading…</span>}
       </div>
 
