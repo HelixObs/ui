@@ -38,6 +38,8 @@ export default function MonitorClient() {
   const [customFrom, setCustomFrom] = useState("");
   const [customTo, setCustomTo] = useState("");
 
+  const [instruments, setInstruments] = useState<string[]>([]);
+
   // Add-panel form state
   const [showAddPanel, setShowAddPanel] = useState(false);
   const [fields, setFields] = useState<string[]>([]);
@@ -58,6 +60,18 @@ export default function MonitorClient() {
       const saved = localStorage.getItem(LS_PANELS);
       if (saved) setPanels(JSON.parse(saved));
     } catch { /* ignore */ }
+
+    fetch("/api/instruments")
+      .then(r => r.ok ? r.json() : [])
+      .then((ids: string[]) => {
+        setInstruments(ids);
+        // Auto-select if only one instrument and none persisted
+        if (ids.length === 1 && !localStorage.getItem(LS_INSTRUMENT)) {
+          setInstrument(ids[0]);
+          setInstrumentInput(ids[0]);
+        }
+      })
+      .catch(() => {});
   }, []);
 
   useEffect(() => { localStorage.setItem(LS_INSTRUMENT, instrument); }, [instrument]);
@@ -157,20 +171,33 @@ export default function MonitorClient() {
       {/* Instrument row */}
       <div className="flex items-center gap-3">
         <span className="text-sm font-semibold text-zinc-700 shrink-0">Instrument</span>
-        <input
-          type="text"
-          placeholder="e.g. CHIMEFRB"
-          className="border border-zinc-300 rounded px-2 py-1 text-sm w-40"
-          value={instrumentInput}
-          onChange={e => setInstrumentInput(e.target.value)}
-          onKeyDown={e => { if (e.key === "Enter") applyInstrument(); }}
-        />
-        <button
-          onClick={applyInstrument}
-          className="px-3 py-1 rounded text-xs font-medium bg-zinc-800 text-white hover:bg-zinc-900 transition-colors"
-        >
-          Apply
-        </button>
+        {instruments.length > 0 ? (
+          <select
+            className="border border-zinc-300 rounded px-2 py-1 text-sm"
+            value={instrument}
+            onChange={e => { setInstrument(e.target.value); setInstrumentInput(e.target.value); }}
+          >
+            <option value="">Select instrument…</option>
+            {instruments.map(id => <option key={id} value={id}>{id}</option>)}
+          </select>
+        ) : (
+          <>
+            <input
+              type="text"
+              placeholder="e.g. CHIMEFRB"
+              className="border border-zinc-300 rounded px-2 py-1 text-sm w-40"
+              value={instrumentInput}
+              onChange={e => setInstrumentInput(e.target.value)}
+              onKeyDown={e => { if (e.key === "Enter") applyInstrument(); }}
+            />
+            <button
+              onClick={applyInstrument}
+              className="px-3 py-1 rounded text-xs font-medium bg-zinc-800 text-white hover:bg-zinc-900 transition-colors"
+            >
+              Apply
+            </button>
+          </>
+        )}
       </div>
 
       {/* Time window row */}
