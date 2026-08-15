@@ -146,7 +146,9 @@ export default function SherlockHomePage() {
           </div>
           <p className="mt-6 text-xs text-stone-400 text-center">
             You can also open Sherlock from any entity via the{" "}
-            <Link href="/" className="text-amber-700 hover:text-amber-900 underline">provenance graph</Link>.
+            <Link href="/" className="text-amber-700 hover:text-amber-900 underline">provenance graph</Link>,
+            or review past exchanges in the{" "}
+            <Link href="/sherlock/audit" className="text-amber-700 hover:text-amber-900 underline">audit log</Link>.
           </p>
         </section>
       </div>
