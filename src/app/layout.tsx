@@ -20,8 +20,8 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
             HELIXOBS
           </Link>
           <span className="text-zinc-200 text-xs">|</span>
-          <Link href="/sherlock" className="text-sm font-semibold text-amber-700 hover:text-amber-900 transition-colors">
-            Sherlock
+          <Link href="/sherlock/audit" className="text-sm font-semibold text-amber-700 hover:text-amber-900 transition-colors">
+            Audit
           </Link>
           <Link href="/monitor" className="text-sm font-semibold text-zinc-700 hover:text-zinc-900 transition-colors">
             Monitor
